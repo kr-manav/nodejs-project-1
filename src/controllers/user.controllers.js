@@ -17,7 +17,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or: [{ username }, { email }],
     });
 
@@ -26,7 +26,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImgLocalPath = req.files?.coverImage[0]?.path;
+    const coverImgLocalPath = req.files.coverImage ? req.files?.coverImage[0]?.path : "";
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required");
@@ -50,7 +50,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         "-password -refreshToken"
     );
 
-    if (createdUser) {
+    if (!createdUser) {
         throw new ApiError(500, "Something went wrong while register");
     }
 
