@@ -1,7 +1,9 @@
 import { User } from "../models/user.models.js";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const verifyJwt = asyncHandler(async (req, res, next) => {
     try {

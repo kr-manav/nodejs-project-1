@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
+import dotenv from "dotenv";
+import { ApiError } from "../utils/ApiError.js";
+dotenv.config();
+        
 const userSchema = new mongoose.Schema(
     {
         username: {
@@ -62,26 +65,50 @@ userSchema.methods.isCorrectPassword = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            username: this.username,
-            fullname: this.fullname,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        process.env.ACCESS_TOKEN_EXPIRY
-    );
+    try {
+        const sign = jwt.sign(
+            {
+                _id: this._id,
+                email: this.email,
+                username: this.username,
+                fullname: this.fullname,
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+            }
+        );
+        console.log("🚀 ~ file: user.models.js:81 ~ sign:", sign)
+
+
+        return sign;
+    } catch (error) {
+        throw new ApiError(
+            500,
+            error?.message || "Error while generating access token"
+        );
+    }
 };
 
-userSchema.methods.generateRefershToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        process.env.REFRESH_TOKEN_EXPIRY
-    );
+userSchema.methods.generateRefreshToken = function () {
+    try {
+        const sign = jwt.sign(
+            {
+                _id: this._id,
+            },
+            process.env.REFRESH_TOKEN_SECRET,
+            {
+                expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+            }
+        );
+
+        return sign;
+    } catch (error) {
+        throw new ApiError(
+            500,
+            error?.message || "Error while generating refresh token"
+        );
+    }
 };
 
 export const User = mongoose.model("User", userSchema);
