@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
     changeCurrentPassword,
     getCurrentUser,
+    getUserProfile,
+    getUserWatchHistory,
     loginUser,
     logoutUser,
     refreshAccessToken,
@@ -57,5 +59,9 @@ router.route("/updateCoverImg").post(
     verifyJwt,
     updateAccountCoverImg
 );
+
+router.route("/user/:username").get(verifyJwt, getUserProfile);
+
+router.route("/watchHistory").get(verifyJwt, getUserWatchHistory);
 
 export default router;
